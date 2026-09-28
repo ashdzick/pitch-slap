@@ -1,7 +1,5 @@
 # LinkedIn Bingo/Tic-Tac-Toe
 
-Only you can prevent pitch slapping.
-
 A playable version of the LinkedIn Bingo/Tic-Tac-Toe graphic (made in collaboration with Marya Jan). Instead of pitch slapping a new connection in the DMs, send them a card.
 
 ## How to play
@@ -10,7 +8,7 @@ A playable version of the LinkedIn Bingo/Tic-Tac-Toe graphic (made in collaborat
 2. Tap a square once if you've **seen it** on LinkedIn (◯), twice if you've **done it** (✕), a third time to clear it.
 3. Three in a row wins. The center (AI posts) is a free space.
 4. **Add your own squares** (up to 8). They go on your current card and every new card, and anyone you share the card with sees them too.
-5. **Save image** makes a PNG of your card to post. **Send to a connection** copies a DM with your result and a link to the same card.
+5. **Share** shows your card as an image to download or post, and can copy a DM for a connection or a result for the comments, each with a link to the same card.
 
 ## How it works
 

@@ -161,12 +161,14 @@
       if (kinds.every(function (k) { return k === SEEN; })) return "TIC-TAC-TOE! Professional witness.";
       return "TIC-TAC-TOE!";
     }
-    if (!c.seen && !c.did) return forImage ? "Only you can prevent pitch slapping." : "Tap what you've seen (or done) on LinkedIn";
+    if (!c.seen && !c.did) return forImage ? "Seen it or done it? Mark it." : HINT;
     var parts = [];
     if (c.seen) parts.push(c.seen + " seen");
     if (c.did) parts.push(c.did + " done");
     return parts.join(" · ");
   }
+
+  var HINT = "Tap once if you've seen it. Tap twice if you've done it.";
 
   function emojiGrid(marks) {
     var sym = ["⬜", "⭕", "❌", "🆓"];
@@ -236,6 +238,7 @@
 
     var winning = wins.length > 0;
     statusEl.textContent = statusText(state.marks);
+    statusEl.classList.toggle("hint", statusEl.textContent === HINT);
     statusEl.classList.toggle("win", winning);
     if (winning && !wasWinning) confetti();
     wasWinning = winning;
@@ -316,7 +319,7 @@
 
   function copyResult() {
     var text = "LinkedIn Bingo/Tic-Tac-Toe\n" + emojiGrid(state.marks) + "\n" +
-      statusText(state.marks, true) + "\nOnly you can prevent pitch slapping: " + shareLink(false);
+      statusText(state.marks, true) + "\nPlay: " + shareLink(false);
     copyText(text, "Copied! Paste it in the comments.");
   }
 
@@ -334,7 +337,7 @@
   }
 
   function makeImage() {
-    var btn = $("btn-image");
+    var btn = $("btn-share");
     btn.disabled = true;
     fontsReady().then(function () {
       var canvas = document.createElement("canvas");
@@ -354,6 +357,7 @@
         $("img-download").href = imgUrl;
         var file = new File([blob], "linkedin-bingo.png", { type: "image/png" });
         $("img-share").hidden = !(navigator.canShare && navigator.canShare({ files: [file] }));
+        $("img-download").classList.toggle("span-all", $("img-share").hidden);
         var dlg = $("img-dialog");
         if (dlg.showModal) dlg.showModal(); else window.open(imgUrl, "_blank");
       }, "image/png");
@@ -362,7 +366,7 @@
 
   function shareImage() {
     var file = new File([imgBlob], "linkedin-bingo.png", { type: "image/png" });
-    navigator.share({ files: [file], text: "Only you can prevent pitch slapping: " + shareLink(false) })
+    navigator.share({ files: [file], text: "Play: " + shareLink(false) })
       .catch(function () {});
   }
 
@@ -505,7 +509,7 @@
     $("btn-clear").addEventListener("click", function () {
       state.marks = blankMarks(); wasWinning = false; save(); render();
     });
-    $("btn-image").addEventListener("click", makeImage);
+    $("btn-share").addEventListener("click", makeImage);
     $("btn-send").addEventListener("click", sendToConnection);
     $("btn-copy").addEventListener("click", copyResult);
     $("img-share").addEventListener("click", shareImage);
