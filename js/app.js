@@ -8,24 +8,51 @@
   var $ = function (id) { return document.getElementById(id); };
   var grid = $("grid"), strikes = $("strikes"), statusEl = $("status");
 
-  // state.cells: 8 square indices for the non-center spots, in reading order.
+  // state.cells: 8 squares for the non-center spots, in reading order. Each is
+  // either a number (index into B.SQUARES) or a string (a square someone wrote).
   // state.marks: 9 marks, one per spot. Center is always FREE_MARK.
   var state;
   var wasWinning = false;
+  var custom = []; // this browser's own squares
+
+  var CUSTOM_KEY = "li-bingo-custom-v1";
+  var MAX_CUSTOM = 8, MAX_LEN = 60;
 
   // ---------- card encoding (for share links) ----------
+  // ?c= holds 8 two-character slots: a base36 pool index, or "__" for a
+  // written square. Written squares follow in order as repeated &t= params.
 
-  function encodeCells(cells) {
-    return cells.map(function (n) { return ("0" + n.toString(36)).slice(-2); }).join("");
+  function encodeCard(cells) {
+    var c = "", t = "";
+    cells.forEach(function (n) {
+      if (typeof n === "number") c += ("0" + n.toString(36)).slice(-2);
+      else { c += "__"; t += "&t=" + encodeURIComponent(n); }
+    });
+    return "c=" + c + t;
   }
 
-  function decodeCells(code) {
-    if (!/^[0-9a-z]{16}$/.test(code || "")) return null;
-    var cells = [];
-    for (var i = 0; i < 16; i += 2) cells.push(parseInt(code.slice(i, i + 2), 36));
-    var valid = cells.every(function (n) { return n < B.SQUARES.length; }) &&
-      new Set(cells).size === 8;
-    return valid ? cells : null;
+  function cleanText(text) {
+    return String(text || "").replace(/\s+/g, " ").trim().slice(0, MAX_LEN);
+  }
+
+  function decodeCard(params) {
+    var code = params.get("c") || "";
+    if (!/^([0-9a-z]{2}|__){8}$/.test(code)) return null;
+    var written = params.getAll("t").map(cleanText);
+    var cells = [], w = 0;
+    for (var i = 0; i < 16; i += 2) {
+      var slot = code.slice(i, i + 2);
+      if (slot === "__") {
+        if (!written[w]) return null;
+        cells.push(written[w++]);
+      } else {
+        var n = parseInt(slot, 36);
+        if (n >= B.SQUARES.length) return null;
+        cells.push(n);
+      }
+    }
+    if (w !== written.length || new Set(cells).size !== 8) return null;
+    return cells;
   }
 
   function encodeMarks(marks) {
@@ -45,19 +72,36 @@
     return m;
   }
 
-  function randomCells() {
-    var pool = [];
-    for (var i = 0; i < B.SQUARES.length; i++) if (B.RETIRED.indexOf(i) < 0) pool.push(i);
-    for (var j = pool.length - 1; j > 0; j--) {
+  function shuffle(a) {
+    for (var j = a.length - 1; j > 0; j--) {
       var k = Math.floor(Math.random() * (j + 1));
-      var t = pool[j]; pool[j] = pool[k]; pool[k] = t;
+      var t = a[j]; a[j] = a[k]; a[k] = t;
     }
-    return pool.slice(0, 8);
+    return a;
+  }
+
+  // Pool squares not retired and not in `exclude`, in random order.
+  function poolDraw(exclude) {
+    var pool = [];
+    for (var i = 0; i < B.SQUARES.length; i++) {
+      if (B.RETIRED.indexOf(i) < 0 && exclude.indexOf(i) < 0) pool.push(i);
+    }
+    return shuffle(pool);
+  }
+
+  // Every one of your own squares, topped up from the pool, in random spots.
+  function randomCells() {
+    var cells = custom.slice(0, 8);
+    return shuffle(cells.concat(poolDraw([]).slice(0, 8 - cells.length)));
   }
 
   function texts() {
     var out = [], c = 0;
-    for (var i = 0; i < 9; i++) out.push(i === FREE ? B.FREE_SPACE : B.SQUARES[state.cells[c++]]);
+    for (var i = 0; i < 9; i++) {
+      if (i === FREE) { out.push(B.FREE_SPACE); continue; }
+      var cell = state.cells[c++];
+      out.push(typeof cell === "number" ? B.SQUARES[cell] : cell);
+    }
     return out;
   }
 
@@ -70,12 +114,26 @@
   function loadSaved() {
     try {
       var s = JSON.parse(localStorage.getItem(STORE_KEY));
-      if (s && decodeCells(encodeCells(s.cells)) && Array.isArray(s.marks) && s.marks.length === 9) {
+      if (s && Array.isArray(s.cells) && s.cells.length === 8 &&
+          decodeCard(new URLSearchParams(encodeCard(s.cells))) &&
+          Array.isArray(s.marks) && s.marks.length === 9) {
         s.marks[FREE] = FREE_MARK;
         return s;
       }
     } catch (e) {}
     return null;
+  }
+
+  function saveCustom() {
+    try { localStorage.setItem(CUSTOM_KEY, JSON.stringify(custom)); } catch (e) {}
+  }
+
+  function loadCustom() {
+    try {
+      var c = JSON.parse(localStorage.getItem(CUSTOM_KEY));
+      if (Array.isArray(c)) return c.map(cleanText).filter(Boolean).slice(0, MAX_CUSTOM);
+    } catch (e) {}
+    return [];
   }
 
   // ---------- scoring ----------
@@ -186,7 +244,7 @@
   }
 
   function syncUrl() {
-    try { history.replaceState(null, "", "?c=" + encodeCells(state.cells)); } catch (e) {}
+    try { history.replaceState(null, "", "?" + encodeCard(state.cells)); } catch (e) {}
   }
 
   // ---------- actions ----------
@@ -215,7 +273,7 @@
   }
 
   function shareLink(withMarks) {
-    var url = siteUrl() + "?c=" + encodeCells(state.cells);
+    var url = siteUrl() + "?" + encodeCard(state.cells);
     if (withMarks) url += "&m=" + encodeMarks(state.marks);
     return url;
   }
@@ -308,6 +366,75 @@
       .catch(function () {});
   }
 
+  // ---------- your own squares ----------
+
+  function renderCustom() {
+    var list = $("custom-list");
+    list.innerHTML = "";
+    custom.forEach(function (text) {
+      var li = document.createElement("li");
+      var span = document.createElement("span");
+      span.textContent = text;
+      var rm = document.createElement("button");
+      rm.type = "button";
+      rm.className = "custom-remove";
+      rm.textContent = "✕";
+      rm.setAttribute("aria-label", "Remove " + text);
+      rm.addEventListener("click", function () { removeCustom(text); });
+      li.appendChild(span);
+      li.appendChild(rm);
+      list.appendChild(li);
+    });
+    var full = custom.length >= MAX_CUSTOM;
+    $("custom-input").disabled = full;
+    $("custom-add").disabled = full;
+    $("custom-input").placeholder = full ? "That's 8. Remove one to add another." : "e.g. \"Thought leader\" in their headline";
+    $("custom-count").textContent = custom.length ? custom.length + " of " + MAX_CUSTOM : "";
+  }
+
+  // Put a written square on the current card, over an unmarked pool square if there is one.
+  function placeOnCard(text) {
+    var spots = [];
+    state.cells.forEach(function (cell, k) { if (typeof cell === "number") spots.push(k); });
+    if (!spots.length) return false;
+    var markIndex = function (k) { return k < FREE ? k : k + 1; };
+    var open = spots.filter(function (k) { return state.marks[markIndex(k)] === NONE; });
+    var pick = shuffle(open.length ? open : spots)[0];
+    state.cells[pick] = text;
+    state.marks[markIndex(pick)] = NONE;
+    return true;
+  }
+
+  function addCustom(raw) {
+    var text = cleanText(raw);
+    if (!text) return;
+    var lower = text.toLowerCase();
+    var taken = custom.concat(texts()).some(function (t) { return t.toLowerCase() === lower; });
+    if (taken) { toast("That square is already there"); return; }
+    custom.push(text);
+    saveCustom();
+    placeOnCard(text);
+    save();
+    render();
+    renderCustom();
+    $("custom-input").value = "";
+    toast("Added to your card");
+  }
+
+  function removeCustom(text) {
+    custom = custom.filter(function (t) { return t !== text; });
+    saveCustom();
+    var k = state.cells.indexOf(text);
+    if (k >= 0) {
+      var onCard = state.cells.filter(function (c) { return typeof c === "number"; });
+      state.cells[k] = poolDraw(onCard)[0];
+      state.marks[k < FREE ? k : k + 1] = NONE;
+      save();
+      render();
+    }
+    renderCustom();
+  }
+
   // ---------- flair ----------
 
   var toastTimer;
@@ -340,11 +467,12 @@
 
   function boot() {
     var params = new URLSearchParams(location.search);
-    var linkCells = decodeCells(params.get("c"));
+    var linkCells = decodeCard(params);
     var theirMarks = decodeMarks(params.get("m"));
     var saved = loadSaved();
+    custom = loadCustom();
 
-    if (linkCells && saved && encodeCells(saved.cells) === encodeCells(linkCells) && !theirMarks) {
+    if (linkCells && saved && encodeCard(saved.cells) === encodeCard(linkCells) && !theirMarks) {
       state = saved; // reopening your own card
     } else if (linkCells) {
       state = { cells: linkCells, marks: blankMarks() };
@@ -385,7 +513,13 @@
     $("img-dialog").addEventListener("click", function (e) { if (e.target === this) this.close(); });
     document.querySelector(".incoming-close").addEventListener("click", function () { $("incoming").hidden = true; });
 
+    $("custom-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      addCustom($("custom-input").value);
+    });
+
     render();
+    renderCustom();
   }
 
   boot();

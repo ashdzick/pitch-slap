@@ -70,7 +70,18 @@
       <button id="btn-classic" class="btn btn-ghost" type="button">Original card</button>
     </div>
 
-    <details class="rules">
+    <details class="panel custom">
+      <summary>Add your own squares <span id="custom-count" class="count"></span></summary>
+      <form id="custom-form" class="custom-form" autocomplete="off">
+        <label for="custom-input" class="sr-only">Your square</label>
+        <input id="custom-input" type="text" maxlength="60" placeholder="e.g. &quot;Thought leader&quot; in their headline">
+        <button id="custom-add" class="btn btn-primary" type="submit">Add</button>
+      </form>
+      <ul id="custom-list" class="custom-list"></ul>
+      <p class="custom-hint">Your squares go on your card and every new card, up to 8. They're saved in this browser and included when you share your card.</p>
+    </details>
+
+    <details class="panel rules">
       <summary>How to play</summary>
       <ol>
         <li>Instead of pitch slapping in the DMs, send this to a recent connection.</li>
