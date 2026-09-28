@@ -2,10 +2,9 @@
 // so reordering or deleting entries would scramble cards people already sent.
 // To retire a square, add its index to RETIRED instead of removing it.
 window.BINGO = {
-  FREE_SPACE: "AI posts (FREE SPACE)",
-
-  // Indices 0 to 7 are the original graphic, in reading order.
-  CLASSIC: [0, 1, 2, 3, 4, 5, 6, 7],
+  // The original graphic, in reading order. Its center square was a free
+  // space; it is a normal square now (index 80).
+  CLASSIC: [0, 1, 2, 3, 80, 4, 5, 6, 7],
 
   RETIRED: [],
 
@@ -89,6 +88,7 @@ window.BINGO = {
     "\"Thoughts?\"",
     "Reposting without adding anything",
     "Congrats on a job they left years ago",
-    "\"Humbled and honored to share...\""
+    "\"Humbled and honored to share...\"",
+    "AI posts"
   ]
 };

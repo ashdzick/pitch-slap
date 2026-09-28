@@ -4,11 +4,11 @@ A playable version of the LinkedIn Bingo/Tic-Tac-Toe graphic (made in collaborat
 
 ## How to play
 
-1. Get a card. The first one is the original graphic; **New card** draws 8 random squares from a pool of 80.
-2. Tap a square once if you've **seen it** on LinkedIn (◯), twice if you've **done it** (✕), a third time to clear it.
-3. Three in a row wins. The center (AI posts) is a free space.
-4. **Add your own squares** (up to 8). They go on your current card and every new card, and anyone you share the card with sees them too.
-5. **Share** shows your card as an image to download or post, and can copy a DM for a connection or a result for the comments, each with a link to the same card.
+1. **Make a card.** It starts as the original graphic. Tap any square to rewrite it, or **Shuffle** to deal new squares from a pool of 81 (squares you wrote stay put).
+2. **Claim a square** you've actually seen or done on LinkedIn. The sender is ✕ and always goes first.
+3. **Send it.** The page writes a DM with a link. Paste it to a recent connection instead of a pitch.
+4. **Trade links.** They open it, claim a square as ◯, and send a new link back in the same DM. First to three in a row wins; nine squares with no line is a draw.
+5. **Save image** at any point makes a PNG of the board in the original graphic's style.
 
 ## How it works
 
@@ -23,9 +23,8 @@ Plain HTML, CSS and JavaScript. No build step, no server, no AI, no API keys, no
 | `js/app.js` | Game logic, sharing, saving |
 | `og.png` | Link preview image for LinkedIn |
 
-* **Your card and marks** are saved in the browser's localStorage, so a refresh keeps your game.
-* **Your own squares** are saved in localStorage too.
-* **Share links** carry the card in the URL, so no database is needed. `?c=` holds the 8 square numbers (`__` marks a square someone wrote), each written square follows as its own `&t=`, and `&m=` holds the sender's marks.
+* **Every game lives in its link**, so there's no server or database. `?g=` is the game id, `?c=` holds the 9 squares (a pool number, or `__` for a written square whose text follows as its own `&t=`), `?v=` lists the claimed squares in play order (✕ first), and `?x=` / `?o=` are the players' names.
+* **localStorage** remembers your games, which side you're on in each, and your name. Opening an older link for a game you already have keeps the newer state.
 
 ### Adding squares
 

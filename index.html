@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>LinkedIn Bingo/Tic-Tac-Toe</title>
-  <meta name="description" content="Instead of pitch slapping in the DMs, send a connection a LinkedIn Bingo/Tic-Tac-Toe card. Mark what you've seen or done. Three in a row wins.">
+  <meta name="description" content="Make a LinkedIn Bingo/Tic-Tac-Toe card, send it to a connection instead of a pitch, and trade moves until someone gets three in a row.">
   <meta name="theme-color" content="#283141">
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="LinkedIn Bingo/Tic-Tac-Toe">
-  <meta property="og:description" content="Get a card, mark what you've seen or done, three in a row wins.">
+  <meta property="og:description" content="Make a card, claim a square you've seen on LinkedIn, and send it to a connection instead of a pitch. Three in a row wins.">
   <meta property="og:url" content="https://ashdzick.github.io/pitch-slap/">
   <meta property="og:image" content="https://ashdzick.github.io/pitch-slap/og.png">
   <meta property="og:image:width" content="1200">
@@ -19,13 +19,14 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,700;0,800;1,800&family=Roboto:wght@500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,700;0,800;1,800&family=Roboto:wght@400;500;700&display=swap">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <svg class="backdrop" viewBox="0 0 800 1000" preserveAspectRatio="none" aria-hidden="true">
     <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.28 0"/></filter>
     <rect width="800" height="1000" fill="#4a62c6"/>
+    <polygon points="0,0 275,0 800,690 800,1000 395,1000 60,470 0,350" fill="#ef6436"/>
     <rect width="800" height="1000" filter="url(#grain)"/>
   </svg>
 
@@ -34,70 +35,91 @@
   </header>
 
   <main>
-    <section id="incoming" class="incoming" hidden aria-live="polite">
-      <button class="incoming-close" type="button" aria-label="Dismiss">✕</button>
-      <p><strong>A connection sent you this instead of a pitch slap.</strong></p>
-      <div class="incoming-body">
-        <div id="incoming-grid" class="mini" role="img"></div>
-        <p id="incoming-status"></p>
-      </div>
-      <p class="incoming-cta">Same card. Your turn.</p>
-    </section>
+    <div id="players" class="players" hidden>
+      <span id="chip-x" class="player"></span>
+      <span id="chip-o" class="player"></span>
+    </div>
+    <p id="big" class="big" aria-live="polite" hidden></p>
+    <p id="pill" class="pill" hidden></p>
 
     <div class="board-wrap">
-      <div id="grid" class="grid" role="group" aria-label="Bingo card"></div>
+      <div id="grid" class="grid" role="group" aria-label="Card"></div>
       <svg id="strikes" class="strikes" viewBox="0 0 3 3" aria-hidden="true"></svg>
     </div>
 
-    <p id="status" class="status" aria-live="polite"></p>
+    <p id="note" class="note" aria-live="polite" hidden></p>
 
-    <div class="actions">
-      <button id="btn-new" class="btn btn-primary" type="button">New card</button>
-      <button id="btn-share" class="btn btn-accent" type="button">Share</button>
-    </div>
-    <div class="links">
-      <button id="btn-clear" class="link" type="button">Clear marks</button>
-      <button id="btn-classic" class="link" type="button">Original card</button>
-    </div>
+    <div id="bar" class="bar"></div>
+    <p id="new-link" class="new-link" hidden><button id="btn-new-game" class="link" type="button">Start a new card</button></p>
 
-    <details class="panel custom">
-      <summary>Add your own squares <span id="custom-count" class="count"></span></summary>
-      <form id="custom-form" class="custom-form" autocomplete="off">
-        <label for="custom-input" class="sr-only">Your square</label>
-        <input id="custom-input" type="text" maxlength="60" placeholder="e.g. &quot;Thought leader&quot; in their headline">
-        <button id="custom-add" class="btn btn-primary" type="submit">Add</button>
-      </form>
-      <ul id="custom-list" class="custom-list"></ul>
-      <p class="custom-hint">Your squares go on your card and every new card, up to 8. They're saved in this browser and included when you share your card.</p>
-    </details>
-
-    <details class="panel rules">
+    <details class="howto">
       <summary>How to play</summary>
       <ol>
-        <li>Instead of pitch slapping in the DMs, send this to a recent connection.</li>
-        <li>Only fill in squares you have <b>witnessed</b> (◯) or <b>performed</b> (✕) on LinkedIn. Be honest.</li>
-        <li>Three in a row wins. The middle square is free, because AI posts are everywhere.</li>
-        <li>Don't like your squares? Hit New card. There are 80 to draw from.</li>
+        <li>Make a card. Tap any square to rewrite it, or Shuffle for new ones.</li>
+        <li>Claim a square you've actually seen (or done) on LinkedIn. You're ✕.</li>
+        <li>Instead of pitch slapping a recent connection, send them the link. They claim a square as ◯ and send a link back.</li>
+        <li>Keep trading links in the same DM. First to three in a row wins.</li>
       </ol>
     </details>
 
     <footer class="footer">
-      <p>Based on the original LinkedIn Bingo/Tic&#8209;Tac&#8209;Toe graphic, made in collaboration with Marya Jan. No tracking; your card stays in your browser.</p>
+      <p>Based on the original LinkedIn Bingo/Tic&#8209;Tac&#8209;Toe graphic, made in collaboration with Marya Jan. No tracking; games live in your browser and your links.</p>
     </footer>
   </main>
 
-  <dialog id="img-dialog" class="img-dialog" aria-labelledby="img-dialog-title">
-    <div class="dialog-head">
-      <h2 id="img-dialog-title">Share your card</h2>
-      <button id="img-close" class="dialog-close" type="button" aria-label="Close">✕</button>
+  <dialog id="edit-sheet" class="sheet" aria-labelledby="edit-title">
+    <div class="sheet-head">
+      <h2 id="edit-title">Rewrite this square</h2>
+      <button class="sheet-close" type="button" data-close aria-label="Close">✕</button>
     </div>
-    <img id="img-preview" alt="Your LinkedIn Bingo/Tic-Tac-Toe card">
-    <p class="hint">Copy a DM sends a connection your card with a link to play the same one.</p>
-    <div class="dialog-actions">
-      <a id="img-download" class="btn btn-accent" download="linkedin-bingo.png">Download image</a>
-      <button id="img-share" class="btn btn-accent" type="button" hidden>Share image</button>
-      <button id="btn-send" class="btn btn-primary" type="button">Copy a DM</button>
-      <button id="btn-copy" class="btn btn-primary" type="button">Copy for comments</button>
+    <form id="edit-form" class="sheet-body" autocomplete="off">
+      <label for="edit-text" class="sr-only">Square text</label>
+      <textarea id="edit-text" maxlength="60" rows="2"></textarea>
+      <p id="edit-count" class="hint"></p>
+      <div class="row2">
+        <button id="edit-random" class="btn btn-line" type="button">Random square</button>
+        <button class="btn btn-go" type="submit">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="send-sheet" class="sheet" aria-labelledby="send-title">
+    <div class="sheet-head">
+      <h2 id="send-title">Send to a connection</h2>
+      <button class="sheet-close" type="button" data-close aria-label="Close">✕</button>
+    </div>
+    <div class="sheet-body">
+      <label for="my-name" class="field-label">Your first name <span>(optional, shows on the card)</span></label>
+      <input id="my-name" type="text" maxlength="20" autocomplete="given-name">
+      <p class="field-label">Your DM</p>
+      <p id="dm-text" class="dm"></p>
+      <div class="row2">
+        <button id="btn-copy-dm" class="btn btn-go" type="button">Copy DM</button>
+        <button id="btn-image" class="btn btn-line" type="button">Save image</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="moves-sheet" class="sheet" aria-labelledby="moves-title">
+    <div class="sheet-head">
+      <h2 id="moves-title">Moves</h2>
+      <button class="sheet-close" type="button" data-close aria-label="Close">✕</button>
+    </div>
+    <ol id="moves-list" class="moves-list"></ol>
+  </dialog>
+
+  <dialog id="img-sheet" class="sheet" aria-labelledby="img-title">
+    <div class="sheet-head">
+      <h2 id="img-title">Your card</h2>
+      <button class="sheet-close" type="button" data-close aria-label="Close">✕</button>
+    </div>
+    <div class="sheet-body">
+      <img id="img-preview" alt="Your LinkedIn Bingo/Tic-Tac-Toe card">
+      <p class="hint">On a phone, you can also press and hold the image to save it.</p>
+      <div class="row2">
+        <a id="img-download" class="btn btn-go" download="linkedin-bingo.png">Download image</a>
+        <button id="img-share" class="btn btn-line" type="button" hidden>Share image</button>
+      </div>
     </div>
   </dialog>
 

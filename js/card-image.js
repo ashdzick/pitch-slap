@@ -85,8 +85,8 @@
     ctx.restore();
   }
 
-  // opts: { texts: [9 strings], marks: [9 ints: 0 none, 1 seen, 2 did, 3 free],
-  //         status: string, footer: string }
+  // opts: { texts: [9 strings], marks: [9 ints: 0 none, 1 O, 2 X],
+  //         lines: [winning lines as 3 cell indices], status: string, footer: string }
   function drawCard(canvas, opts) {
     canvas.width = W; canvas.height = H;
     var ctx = canvas.getContext("2d");
@@ -136,18 +136,12 @@
 
       ctx.fillStyle = m === 1 ? C.seenTint : m === 2 ? C.didTint : C.navy;
       ctx.fillRect(x, y, cs, cs);
-      if (m === 3) {
-        ctx.strokeStyle = "rgba(239,100,54,0.6)";
-        ctx.lineWidth = 6;
-        ctx.strokeRect(x + 3, y + 3, cs - 6, cs - 6);
-      }
       if (m === 1) drawO(ctx, x + cs / 2, y + cs / 2, cs * 0.36);
       if (m === 2) drawX(ctx, x + cs / 2, y + cs / 2, cs * 0.32);
     }
 
-    // Pass 2: strike through every winning line, under the text so it stays readable.
-    LINES.forEach(function (line) {
-      if (!line.every(function (k) { return opts.marks[k] > 0; })) return;
+    // Pass 2: strike through each winning line, under the text so it stays readable.
+    (opts.lines || []).forEach(function (line) {
       var p = centers[line[0]], q = centers[line[2]];
       var dx = (q[0] - p[0]) * 0.14, dy = (q[1] - p[1]) * 0.14;
       ctx.save();
