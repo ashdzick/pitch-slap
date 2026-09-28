@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>LinkedIn Bingo/Tic-Tac-Toe</title>
+  <meta name="description" content="Instead of pitch slapping in the DMs, send a connection a LinkedIn Bingo/Tic-Tac-Toe card. Mark what you've seen or done. Three in a row wins.">
+  <meta name="theme-color" content="#283141">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="LinkedIn Bingo/Tic-Tac-Toe">
+  <meta property="og:description" content="Only you can prevent pitch slapping. Get a card, mark what you've seen or done, three in a row wins.">
+  <meta property="og:url" content="https://ashdzick.github.io/pitch-slap/">
+  <meta property="og:image" content="https://ashdzick.github.io/pitch-slap/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="627">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,700;0,800;1,800&family=Roboto:wght@500;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg class="backdrop" viewBox="0 0 800 1000" preserveAspectRatio="none" aria-hidden="true">
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.28 0"/></filter>
+    <rect width="800" height="1000" fill="#4a62c6"/>
+    <polygon points="0,0 275,0 800,690 800,1000 395,1000 60,470 0,350" fill="#ef6436"/>
+    <rect width="800" height="1000" filter="url(#grain)"/>
+  </svg>
+
+  <header class="titlebar">
+    <h1><span class="li">LinkedIn</span> Bingo/Tic&#8209;Tac&#8209;Toe</h1>
+  </header>
+
+  <main>
+    <p class="tagline">Only you can prevent pitch slapping 🫵</p>
+
+    <section id="incoming" class="incoming" hidden aria-live="polite">
+      <button class="incoming-close" type="button" aria-label="Dismiss">✕</button>
+      <p><strong>📨 A connection sent you this instead of a pitch slap.</strong></p>
+      <div class="incoming-body">
+        <pre id="incoming-grid" aria-label="Their card"></pre>
+        <p id="incoming-status"></p>
+      </div>
+      <p class="incoming-cta">Same card. Your turn.</p>
+    </section>
+
+    <div class="legend" aria-hidden="true">
+      <span><b class="chip chip-o">◯</b> Tap once: seen it</span>
+      <span><b class="chip chip-x">✕</b> Tap twice: done it</span>
+    </div>
+
+    <div class="board-wrap">
+      <div id="grid" class="grid" role="group" aria-label="Bingo card"></div>
+      <svg id="strikes" class="strikes" viewBox="0 0 3 3" aria-hidden="true"></svg>
+    </div>
+
+    <p id="status" class="status" aria-live="polite"></p>
+
+    <div class="actions">
+      <button id="btn-new" class="btn btn-primary" type="button">🎲 New card</button>
+      <button id="btn-image" class="btn btn-primary" type="button">🖼️ Save image</button>
+      <button id="btn-send" class="btn btn-primary btn-wide" type="button">📨 Send to a connection (not a pitch)</button>
+    </div>
+    <div class="actions actions-small">
+      <button id="btn-copy" class="btn btn-ghost" type="button">Copy result for the comments</button>
+      <button id="btn-clear" class="btn btn-ghost" type="button">Clear marks</button>
+      <button id="btn-classic" class="btn btn-ghost" type="button">Original card</button>
+    </div>
+
+    <details class="rules">
+      <summary>How to play</summary>
+      <ol>
+        <li>Instead of pitch slapping in the DMs, send this to a recent connection.</li>
+        <li>Only fill in squares you have <b>witnessed</b> (◯) or <b>performed</b> (✕) on LinkedIn. Be honest.</li>
+        <li>Three in a row wins. The middle square is free, because AI posts are everywhere.</li>
+        <li>Don't like your squares? Hit New card. There are 80 to draw from.</li>
+      </ol>
+    </details>
+
+    <footer class="footer">
+      <p>Based on the original LinkedIn Bingo/Tic&#8209;Tac&#8209;Toe graphic, made in collaboration with Marya Jan.</p>
+      <p>No AI, no tracking, no pitch. Your card lives in your browser.</p>
+    </footer>
+  </main>
+
+  <dialog id="img-dialog" class="img-dialog" aria-labelledby="img-dialog-title">
+    <h2 id="img-dialog-title">Your card</h2>
+    <img id="img-preview" alt="Your LinkedIn Bingo/Tic-Tac-Toe card">
+    <p class="hint">On a phone, you can also press and hold the image to save it.</p>
+    <div class="actions">
+      <a id="img-download" class="btn btn-primary" download="linkedin-bingo.png">⬇️ Download</a>
+      <button id="img-share" class="btn btn-primary" type="button" hidden>📤 Share</button>
+      <button id="img-close" class="btn btn-ghost" type="button">Close</button>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/squares.js"></script>
+  <script src="js/card-image.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
