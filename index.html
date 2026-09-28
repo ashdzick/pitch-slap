@@ -35,13 +35,13 @@
   </header>
 
   <main>
-    <p class="tagline">Only you can prevent pitch slapping 🫵</p>
+    <p class="tagline">Only you can prevent pitch slapping.</p>
 
     <section id="incoming" class="incoming" hidden aria-live="polite">
       <button class="incoming-close" type="button" aria-label="Dismiss">✕</button>
-      <p><strong>📨 A connection sent you this instead of a pitch slap.</strong></p>
+      <p><strong>A connection sent you this instead of a pitch slap.</strong></p>
       <div class="incoming-body">
-        <pre id="incoming-grid" aria-label="Their card"></pre>
+        <div id="incoming-grid" class="mini" role="img"></div>
         <p id="incoming-status"></p>
       </div>
       <p class="incoming-cta">Same card. Your turn.</p>
@@ -60,9 +60,9 @@
     <p id="status" class="status" aria-live="polite"></p>
 
     <div class="actions">
-      <button id="btn-new" class="btn btn-primary" type="button">🎲 New card</button>
-      <button id="btn-image" class="btn btn-primary" type="button">🖼️ Save image</button>
-      <button id="btn-send" class="btn btn-primary btn-wide" type="button">📨 Send to a connection (not a pitch)</button>
+      <button id="btn-new" class="btn btn-primary" type="button">New card</button>
+      <button id="btn-image" class="btn btn-primary" type="button">Save image</button>
+      <button id="btn-send" class="btn btn-primary btn-wide" type="button">Send to a connection (not a pitch)</button>
     </div>
     <div class="actions actions-small">
       <button id="btn-copy" class="btn btn-ghost" type="button">Copy result for the comments</button>
@@ -91,8 +91,8 @@
     <img id="img-preview" alt="Your LinkedIn Bingo/Tic-Tac-Toe card">
     <p class="hint">On a phone, you can also press and hold the image to save it.</p>
     <div class="actions">
-      <a id="img-download" class="btn btn-primary" download="linkedin-bingo.png">⬇️ Download</a>
-      <button id="img-share" class="btn btn-primary" type="button" hidden>📤 Share</button>
+      <a id="img-download" class="btn btn-primary" download="linkedin-bingo.png">Download</a>
+      <button id="img-share" class="btn btn-primary" type="button" hidden>Share</button>
       <button id="img-close" class="btn btn-ghost" type="button">Close</button>
     </div>
   </dialog>

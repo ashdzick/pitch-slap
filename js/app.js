@@ -95,15 +95,15 @@
   function statusText(marks, forImage) {
     var wins = winningLines(marks);
     var c = counts(marks);
-    if (marks.every(function (m) { return m > 0; })) return "BLACKOUT. Log off and touch grass. 🌱";
+    if (marks.every(function (m) { return m > 0; })) return "BLACKOUT. Log off and touch grass.";
     if (wins.length) {
       var kinds = [];
       wins.forEach(function (l) { l.forEach(function (i) { if (i !== FREE) kinds.push(marks[i]); }); });
-      if (kinds.every(function (k) { return k === DID; })) return "TIC-TAC-TOE! Guilty as charged 🙋";
-      if (kinds.every(function (k) { return k === SEEN; })) return "TIC-TAC-TOE! Professional witness 👀";
-      return "TIC-TAC-TOE! 🎉";
+      if (kinds.every(function (k) { return k === DID; })) return "TIC-TAC-TOE! Guilty as charged.";
+      if (kinds.every(function (k) { return k === SEEN; })) return "TIC-TAC-TOE! Professional witness.";
+      return "TIC-TAC-TOE!";
     }
-    if (!c.seen && !c.did) return forImage ? "Only you can prevent pitch slapping 🫵" : "Tap what you've seen (or done) on LinkedIn";
+    if (!c.seen && !c.did) return forImage ? "Only you can prevent pitch slapping." : "Tap what you've seen (or done) on LinkedIn";
     var parts = [];
     if (c.seen) parts.push(c.seen + " seen");
     if (c.did) parts.push(c.did + " done");
@@ -244,7 +244,7 @@
   }
 
   function sendToConnection() {
-    var text = "Instead of pitch slapping you, I'm sending you LinkedIn Bingo/Tic-Tac-Toe 🫵\n\n" +
+    var text = "Instead of pitch slapping you, I'm sending you LinkedIn Bingo/Tic-Tac-Toe.\n\n" +
       emojiGrid(state.marks) + "\n" + statusText(state.marks, true) +
       "\n\nSame card, your turn: " + shareLink(true);
     if (navigator.share && matchMedia("(pointer: coarse)").matches) {
@@ -321,11 +321,12 @@
 
   function confetti() {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    var bits = ["⭕", "❌", "🎉", "🫵", "✨"];
+    var bits = [["◯", "#9db0ff"], ["✕", "#ff7a4d"], ["✕", "#ffffff"]];
     for (var i = 0; i < 36; i++) {
       var s = document.createElement("span");
       s.className = "confetti";
-      s.textContent = bits[i % bits.length];
+      s.textContent = bits[i % bits.length][0];
+      s.style.color = bits[i % bits.length][1];
       s.style.left = Math.random() * 100 + "vw";
       s.style.animationDuration = 1.6 + Math.random() * 1.6 + "s";
       s.style.animationDelay = Math.random() * 0.4 + "s";
@@ -354,7 +355,15 @@
     wasWinning = winningLines(state.marks).length > 0;
 
     if (linkCells && theirMarks) {
-      $("incoming-grid").textContent = emojiGrid(theirMarks);
+      var mini = $("incoming-grid"), glyph = ["", "◯", "✕", "FREE"];
+      theirMarks.forEach(function (m) {
+        var d = document.createElement("span");
+        d.dataset.mark = m;
+        d.textContent = glyph[m];
+        mini.appendChild(d);
+      });
+      var tc = counts(theirMarks);
+      mini.setAttribute("aria-label", "Their card: " + tc.seen + " seen, " + tc.did + " done");
       $("incoming-status").textContent = statusText(theirMarks, true);
       $("incoming").hidden = false;
     }
@@ -363,7 +372,7 @@
       var cell = e.target.closest(".cell");
       if (cell) tap(Number(cell.dataset.i));
     });
-    $("btn-new").addEventListener("click", function () { newCard(); toast("Fresh card! 🎲"); });
+    $("btn-new").addEventListener("click", function () { newCard(); toast("New card"); });
     $("btn-classic").addEventListener("click", function () { newCard(B.CLASSIC.slice()); toast("The original card"); });
     $("btn-clear").addEventListener("click", function () {
       state.marks = blankMarks(); wasWinning = false; save(); render();

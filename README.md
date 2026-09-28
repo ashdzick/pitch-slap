@@ -1,6 +1,6 @@
 # LinkedIn Bingo/Tic-Tac-Toe
 
-Only you can prevent pitch slapping 🫵
+Only you can prevent pitch slapping.
 
 A playable version of the LinkedIn Bingo/Tic-Tac-Toe graphic (made in collaboration with Marya Jan). Instead of pitch slapping a new connection in the DMs, send them a card.
 

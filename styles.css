@@ -246,12 +246,24 @@ main {
 }
 .incoming p { margin: 0 0 8px; }
 .incoming-body { display: flex; align-items: center; gap: 14px; }
-.incoming pre {
-  margin: 0;
-  font-size: 1.1rem;
-  line-height: 1.15;
-  font-family: inherit;
+.mini {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(3, 22px);
+  gap: 2px;
+  padding: 2px;
+  background: var(--orange);
 }
+.mini span {
+  display: grid;
+  place-items: center;
+  height: 22px;
+  background: var(--navy);
+  font: 800 0.8rem/1 var(--body);
+}
+.mini [data-mark="1"] { color: var(--seen); }
+.mini [data-mark="2"] { color: var(--did); }
+.mini [data-mark="3"] { font-size: 0.45rem; letter-spacing: 0.02em; }
 .incoming-body p { margin: 0; font-weight: 700; }
 .incoming-cta { margin-top: 8px !important; font-family: var(--condensed); font-weight: 800; font-size: 1.1rem; color: var(--did); }
 .incoming-close {
@@ -334,7 +346,7 @@ main {
 .confetti {
   position: fixed;
   top: -40px;
-  font-size: 24px;
+  font: 800 24px var(--body);
   pointer-events: none;
   z-index: 10;
   animation: fall linear forwards;
