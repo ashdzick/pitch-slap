@@ -247,7 +247,17 @@
     ["x", "o"].forEach(function (side) {
       var chip = $("chip-" + side);
       var count = game.moves.filter(function (m, n) { return (n % 2 === 0 ? "x" : "o") === side; }).length;
-      chip.textContent = who(side) + " " + GLYPH[side] + " · " + count;
+      chip.textContent = "";
+      var label = document.createElement("span");
+      label.className = "player-name";
+      label.textContent = who(side);
+      var num = document.createElement("span");
+      num.className = "player-count";
+      num.textContent = count;
+      chip.appendChild(label);
+      chip.appendChild(markSvg(side));
+      chip.appendChild(num);
+      chip.setAttribute("aria-label", who(side) + ", " + GLYPH[side] + ", " + count + " claimed");
       chip.className = "player side-" + side + (!out.over && turn() === side ? " now" : "");
     });
 
